@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+    <h1>Search Results</h1>
+    {% if shows %}
+        <ul>
+            {% for show in shows %}
+                <li>
+                    <h2>{{ show.name }}</h2>
+                    <img src="{{ show.image.medium }}" alt="{{ show.name }}">
+                    <p>{{ show.summary }}</p>
+                    
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No shows found.</p>
+    {% endif %}
+</body>
+</html>

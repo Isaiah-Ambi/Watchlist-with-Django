@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search for TV Shows</title>
+</head>
+<body>
+    <h1>Search for TV Shows</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="search_query">Enter a show name:</label>
+        <input type="text" id="search_query" name="search_query">
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>
