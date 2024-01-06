@@ -12,7 +12,7 @@
                     <h2>{{ show.name }}</h2>
                     <img src="{{ show.image }}" alt="{{ show.name }}">
                     <p>{{ show.summary |safe }}</p>
-                    
+                    <a href="{% url 'add-to-watchlist' show.id %}">Add to Watchlist</a>
                 </li>
             {% endfor %}
         </ul>

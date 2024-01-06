@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add to Watchlist</title>
+</head>
+<body>
+    {% if message %}
+        <h2>{{ message }}</h2>
+    {% endif %}
+
+    {% if error_message %}
+        <h2>{{ error_message }}</h2>
+    {% endif %}
+
+    <a href="{% url 'watchlist' %}">Return to Watchlist</a>
+</body>
+</html>
