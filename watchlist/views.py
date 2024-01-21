@@ -86,7 +86,7 @@ def add_to_watchlist(request, id):
         response = requests.get(url)
         show_data = response.json()
 
-        show = Show.objects.create(
+        show = Show.objects.get_or_create(
             tvmaze_id=id,
             name=show_data['name'],
             image_url= show_data['image']['medium'] if show_data['image'] else 'No image',
@@ -120,3 +120,26 @@ def add_to_watchlist(request, id):
             'error_message': "Error retrieving show information. Please try again."
         }
         return render(request, 'watchlist/add_show_to_watchlist.html', context)
+
+# remove show from user watchlist
+def remove_from_watchlist(request, id):
+    try:
+        watchlist_show = WatchListShow.objects.get(user=request.user, show__tvmaze_id=id)
+        watchlist_show.delete()
+        message = f"'{watchlist_show.show.name}' removed from your watchlist."
+        context = {
+            'message': message,
+        }
+        return render(request, 'watchlist/add_show_to_watchlist.html', context)
+    except WatchListShow.DoesNotExist:
+        context = {
+            'error_message': "Show not found in your watchlist."
+        }
+        return render(request, 'watchlist/add_show_to_watchlist.html', context)
+    
+def update_watch_status(request, id):
+    watchlist_show = WatchListShow.objects.get(user=request.user, show__tvmaze_id=id)
+    if request.method == 'PUT':
+        pass
+    pass
+    

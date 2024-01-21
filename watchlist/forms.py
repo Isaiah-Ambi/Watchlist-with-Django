@@ -12,3 +12,4 @@ class NewShowForm(forms.ModelForm):
     class Meta:
         model = Show
         fields = ['tvmaze_id', 'name', 'genres', 'status', 'image_url', 'premiered', 'rating', 'summary']
+

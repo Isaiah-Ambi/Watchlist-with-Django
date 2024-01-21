@@ -1,6 +1,6 @@
 
 <ul>
     {% for show in watchlist %}
-    <li>{{ show }}</li>
+    <li> {{ show.show.name }} <img src="{{ show.show.image_url }}"> <a href="{% url 'remove-from-watchlist' show.show.tvmaze_id %}">remove</a></li>
     {% endfor %}
 </ul>
