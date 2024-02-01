@@ -8,6 +8,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('search/', views.search_shows, name='search'),
     path('add-to-watchlist/<int:id>/', views.add_to_watchlist, name='add-to-watchlist'),
+    path('update-show-status/<int:id>/', views.update_show_watch_status, name='update-show-status'),
+    path('profile/', views.profile, name='profile'),
     path('delete-show/<int:id>/', views.remove_from_watchlist, name='remove-from-watchlist'),
     path('', views.watchlist, name='watchlist'),
 ]

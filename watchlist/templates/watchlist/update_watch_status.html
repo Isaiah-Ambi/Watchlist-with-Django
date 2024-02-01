@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Watch Status</title>
+</head>
+<body>
+    <h1>Update Watch Status for "{{ show.name }}"</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update Watch Status</button>
+    </form>
+    <a href="{% url 'watchlist' %}">Back to Watchlist</a>
+</body>
+</html>

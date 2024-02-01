@@ -10,9 +10,9 @@
             {% for show in shows %}
                 <li>
                     <h2>{{ show.name }}</h2>
-                    <img src="{{ show.image }}" alt="{{ show.name }}">
+                    <img src="{{ show.image_url }}" alt="{{ show.name }}">
                     <p>{{ show.summary |safe }}</p>
-                    <a href="{% url 'add-to-watchlist' show.id %}">Add to Watchlist</a>
+                    <a href="{% url 'add-to-watchlist' show.tvmaze_id %}">Add to Watchlist</a>
                 </li>
             {% endfor %}
         </ul>

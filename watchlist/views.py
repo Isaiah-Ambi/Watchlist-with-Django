@@ -2,13 +2,12 @@ from types import NoneType
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from .forms import RegistrationForm
-from .models import Show, WatchListShow
+from .forms import RegistrationForm, WatchListShowForm, CustomListForm
+from .models import Show, WatchListShow, CustomList
 import requests
 import json
 
 # Create your views here.
-
 def registration_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -39,25 +38,14 @@ def search_shows(request):
         # Parse response and extract show data
         show_data = response.json()
         shows = []
-        #exception for nonetype element
-        # if show_data == NoneType:
-        #     shows = []
-        # else:
-        #     for show in show_data:
-        #         shows.append({
-        #             'name': show['show']['name'],
-        #             'id': show['show']['id'],
-        #             'image': show['show']['image']['medium'] if show['show']['image'] else 'No image'
-        #         })
-        # print(show_data)
-        # shows = show_data['show']
+
         show = []
         for show in show_data:
             
             shows.append({
                 'name': show['show']['name'],
-                'id': show['show']['id'],
-                'image': show['show']['image']['medium'] if show['show']['image'] else 'No image',
+                'tvmaze_id': show['show']['id'],
+                'image_url': show['show']['image']['medium'] if show['show']['image'] else 'No image',
                 'summary': show['show']['summary'],
                 'rating': show['show']['rating']['average'],
                 'status': show['show']['status'],
@@ -69,13 +57,11 @@ def search_shows(request):
 
         # Render template with show results
         return render(request, 'watchlist/search_results.html', {'shows': shows})
-
     else:
         return render(request, 'watchlist/search_form.html')
     
 def watchlist(request):
     watchlist = WatchListShow.objects.filter(user=request.user)
-    
     return render(request, 'watchlist/watchlist.html', {'watchlist': watchlist})
 
 
@@ -85,16 +71,15 @@ def add_to_watchlist(request, id):
         url = f"https://api.tvmaze.com/shows/{id}"
         response = requests.get(url)
         show_data = response.json()
-
         show = Show.objects.get_or_create(
-            tvmaze_id=id,
-            name=show_data['name'],
-            image_url= show_data['image']['medium'] if show_data['image'] else 'No image',
-            summary= show_data['summary'],
-            rating= show_data['rating']['average'],
-            status= show_data['status'],
-            genres= show_data['genres'],
-            premiered= show_data['premiered'],
+            tvmaze_id = show_data['id'],
+            name = show_data['name'],
+            image_url = show_data['image']['medium'] if show_data['image'] else 'No image',
+            summary = show_data['summary'],
+            rating = show_data['rating']['average'],
+            status = show_data['status'],
+            genres = show_data['genres'],
+            premiered = show_data['premiered'],
             # ... other fields from API data
         )
 
@@ -124,7 +109,7 @@ def add_to_watchlist(request, id):
 # remove show from user watchlist
 def remove_from_watchlist(request, id):
     try:
-        watchlist_show = WatchListShow.objects.get(user=request.user, show__tvmaze_id=id)
+        watchlist_show = WatchListShow.objects.get(user=request.user, id=id)
         watchlist_show.delete()
         message = f"'{watchlist_show.show.name}' removed from your watchlist."
         context = {
@@ -137,9 +122,55 @@ def remove_from_watchlist(request, id):
         }
         return render(request, 'watchlist/add_show_to_watchlist.html', context)
     
-def update_watch_status(request, id):
-    watchlist_show = WatchListShow.objects.get(user=request.user, show__tvmaze_id=id)
-    if request.method == 'PUT':
-        pass
-    pass
+# update watch_status
+def update_show_watch_status(request, id):
+    try:
+        watchlist_show = WatchListShow.objects.get(user=request.user, id=id)
+
+        # Handle form submission for updating watch status
+        if request.method == 'POST':
+            form = WatchListShowForm(request.POST, instance=watchlist_show)
+            if form.is_valid():
+                form.save()
+                message = f"'{watchlist_show.show.name}' watch status updated!"
+                context = {
+                    'message': message,
+                }
+                return render(request, 'watchlist/add_show_to_watchlist.html', context)
+        else:
+            # Initialize form with current watch status
+            form = WatchListShowForm(instance=watchlist_show)
+
+        context = {
+            'form': form,
+            'show': watchlist_show.show,
+        }
+        return render(request, 'watchlist/update_watch_status.html', context)
+
+    except WatchListShow.DoesNotExist:
+        # Handle show not found in watchlist
+        context = {
+            'error_message': "Show not found in your watchlist.",
+        }
+        return render(request, 'watchlist/add_show_to_watchlist.html', context)
+
     
+@login_required
+def list_custom_lists(request):
+    user_lists = CustomList.objects.filter(user=request.user)
+    context = {'user_lists': user_lists}
+    return render(request, 'your_template/list_custom_lists.html', context)
+
+@login_required
+def create_custom_list(request):
+    if request.method == 'POST':
+        form = CustomListForm(request.POST)
+        if form.is_valid():
+            list = form.save(commit=False)
+            list.user = request.user
+            list.save()
+            return redirect('list_custom_lists')
+    else:
+        form = CustomListForm()
+    context = {'form': form}
+    return render(request, 'your_template/create_custom_list.html', context)

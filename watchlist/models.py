@@ -17,9 +17,21 @@ class Show(models.Model):
     
 class WatchListShow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    show = models.ForeignKey('Show', on_delete=models.CASCADE)  # Assuming a 'Show' model exists
+    show = models.ForeignKey('Show', on_delete=models.RESTRICT)  # Assuming a 'Show' model exists
     watch_status = models.CharField(max_length=20, choices=(
         ('WATCHED', 'Watched'),
         ('CURRENTLY_WATCHING', 'Currently Watching'),
         ('TO_WATCH', 'To Watch'),
     ))
+    favourite = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.show.name
+
+class CustomList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    shows = models.ManyToManyField('WatchListShow')  # Replace with your model
+
+    def __str__(self):
+        return f"{self.user.username}'s list: {self.name}"

@@ -1,0 +1,7 @@
+<h1>Your Custom Lists</h1>
+<ul>
+    {% for list in user_lists %}
+        <li><a href="{% url 'detail_custom_list' list.pk %}">{{ list.name }}</a></li>
+    {% endfor %}
+</ul>
+<a href="{% url 'create_custom_list' %}">Create new list</a>
