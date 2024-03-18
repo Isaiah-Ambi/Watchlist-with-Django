@@ -34,7 +34,7 @@ SECRET_KEY = env('SECRET_KEY')  # <-- Updated!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')  # <-- Updated!
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.fly.dev']  # <-- Updated!
+ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1']  # <-- Updated!
 
 CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']  # <-- Updated!
 
