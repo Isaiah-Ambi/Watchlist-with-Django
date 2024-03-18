@@ -1,11 +1,11 @@
 from types import NoneType
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import RegistrationForm, WatchListShowForm, CustomListForm
 from .models import Show, WatchListShow, CustomList
 import requests
-import json
+
 
 # Create your views here.
 def registration_view(request):
@@ -59,35 +59,36 @@ def search_shows(request):
         return render(request, 'watchlist/search_results.html', {'shows': shows})
     else:
         return render(request, 'watchlist/search_form.html')
-    
+@login_required
 def watchlist(request):
     watchlist = WatchListShow.objects.filter(user=request.user)
     return render(request, 'watchlist/watchlist.html', {'watchlist': watchlist})
 
 
 def add_to_watchlist(request, id):
+
     try:
-        # Retrieve show details from API
+        show = Show.objects.get(tvmaze_id=id)
+    except Show.DoesNotExist:
+    # Show not found, create a new one
         url = f"https://api.tvmaze.com/shows/{id}"
         response = requests.get(url)
         show_data = response.json()
-        show = Show.objects.get_or_create(
+        show = Show.objects.create(
             tvmaze_id = show_data['id'],
             name = show_data['name'],
-            image_url = show_data['image']['medium'] if show_data['image'] else 'No image',
-            summary = show_data['summary'],
-            rating = show_data['rating']['average'],
-            status = show_data['status'],
             genres = show_data['genres'],
+            status = show_data['status'],
+            image_url = show_data['image']['medium'] if show_data['image'] else 'No image',
             premiered = show_data['premiered'],
-            # ... other fields from API data
+            rating = show_data['rating']['average'],
+            summary = show_data['summary'],
         )
 
-        try:
-            watchlist_show = WatchListShow.objects.get(user=request.user, show=show)
-            watchlist_show.delete()  # Remove if already in watchlist
-            message = f"'{show.name}' removed from your watchlist."
-        except WatchListShow.DoesNotExist:
+    try:
+        watchlist_show = WatchListShow.objects.get(user=request.user, show=show)
+        message = f"'{show.name}' show already exists in your watchlist."
+    except WatchListShow.DoesNotExist:
             watchlist_show = WatchListShow.objects.create(
                 user=request.user,
                 show=show,
@@ -95,16 +96,16 @@ def add_to_watchlist(request, id):
             )
             message = f"'{show.name}' added to your watchlist."
 
-        context = {
-            'message': message,
-        }
-        return render(request, 'watchlist/add_show_to_watchlist.html', context)
+            context = {
+                'message': message,
+            }
+            return render(request, 'watchlist/add_show_to_watchlist.html', context)
+
     except requests.exceptions.RequestException as e:
-        # Handle API errors
-        context = {
-            'error_message': "Error retrieving show information. Please try again."
-        }
-        return render(request, 'watchlist/add_show_to_watchlist.html', context)
+        # Handle API errors ...
+        return render(request, 'watchlist/add_show_to_watchlist.html', {'error_message': "Error retrieving show information. Please try again."})
+
+    return redirect('search')
 
 # remove show from user watchlist
 def remove_from_watchlist(request, id):
@@ -174,3 +175,9 @@ def create_custom_list(request):
         form = CustomListForm()
     context = {'form': form}
     return render(request, 'your_template/create_custom_list.html', context)
+
+
+def show_details(request, id):
+    show = WatchListShow.objects.get(pk=id, user=request.user)
+    context = {'watchlist_show': show}
+    return render(request, 'watchlist/show_details.html', context)

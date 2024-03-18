@@ -12,20 +12,31 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+import environ  # <-- Updated!
+
+env = environ.Env(  # <-- Updated!
+    # set casting, default value
+    DEBUG=(bool, False),
+)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# Take environment variables from .env file
+environ.Env.read_env(BASE_DIR / '.env')  # <-- Updated!
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%dwhm6wa^&8&$hcs=1wtthq)dk2wc(kcc5+imk%fb05ju=f+)+'
+SECRET_KEY = env('SECRET_KEY')  # <-- Updated!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')  # <-- Updated!
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.fly.dev']  # <-- Updated!
 
-ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']  # <-- Updated!
 
 
 # Application definition
@@ -37,11 +48,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'whitenoise.runserver_nostatic',  # <-- Updated!
+
+
     'watchlist',
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [    
     'django.middleware.security.SecurityMiddleware',
+
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <-- Updated!
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,11 +93,16 @@ WSGI_APPLICATION = 'watchlist_app.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    # read os.environ['DATABASE_URL']
+    'default': env.db()  # <-- Updated!
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -99,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'watchlist'
 LOGOUT_REDIRECT_URL = 'login'
 # Internationalization
@@ -116,6 +139,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # <-- Updated!
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # <-- Updated!
 
 STATIC_URL = 'static/'
 

@@ -1,0 +1,13 @@
+{% extends 'watchlist/base.html' %}
+{% block content %}
+<div>
+    <article>
+        <header>
+            <h1>{{ watchlist_show.show.name }}</h1>
+            <h4>{{ watchlist_show.watch_status }}</h4>
+        </header>
+    <img src="{{ watchlist_show.show.image }}">
+    <p>{{ watchlist_show.show.summary| safe }}</p>
+    </article>
+</div>
+{% endblock %}

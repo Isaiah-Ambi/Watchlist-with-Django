@@ -1,6 +1,34 @@
+{% extends 'watchlist/base.html' %}
 
-<ul>
-    {% for watchlist_show in watchlist %}
-    <li> {{ watchlist_show }} - {{ watchlist_show.show.watch_status }}<img src="{{ watchlist_show.show.image_url }}">  <a href="{% url 'remove-from-watchlist' watchlist_show.id %}">remove</a> <a href="{% url 'update-show-status' watchlist_show.id %}">update</a></li>
-    {% endfor %}
-</ul>
+{% block content %}
+<div class="grid">
+  {% for watchlist_show in watchlist %}
+  <div class="show">
+    <header>
+      <div>
+        <img class="show_image" src="{{ watchlist_show.show.image_url }}">
+      </div>
+      <div>
+        <a href="{% url 'show-details' watchlist_show.id %}">
+          {{ watchlist_show }}
+        </a>
+      </div> 
+      <div>
+        {{ watchlist_show.show.rating }}
+      </div>
+    </header>
+        <div>
+          {{ watchlist_show.show.status }}
+        </div>
+        <div>
+          {{ watchlist_show.watch_status }}
+        </div>
+      
+    <footer><a href="{% url 'remove-from-watchlist' watchlist_show.id %}">remove</a> 
+      <a href="{% url 'update-show-status' watchlist_show.id %}">update</a></footer>
+  </div>
+  {% endfor %}
+
+  </div>
+
+{% endblock %}

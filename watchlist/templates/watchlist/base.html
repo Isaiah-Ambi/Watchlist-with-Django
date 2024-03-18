@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="{% static 'watchlist/pico.css' %}" rel="stylesheet">
+  <link href="{% static 'watchlist/style.css' %}" rel="stylesheet">
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+/>
+  <title alt="title">Izaya's Watchlist</title>
+</head>
+<body>
+<header>
+  <aside>
+    <nav>
+      <ul>
+          <li><a href="{% url 'watchlist' %}" alt="home">Home</a></li>
+          <li><a href="{% url 'search' %}" alt=""search>Search</a></li>
+          {% if User.is_authenticated %}
+          <li><a href="{% url 'login' %}" alt="login">Login</a></li>
+          {% else %}
+          <li><a href="{% url 'logout' %}" alt="logout">Logout</a></li>
+          {% endif %}
+      </ul>
+    </nav>
+  </aside>
+</header>
+
+<main>
+
+    {% block content %}
+  
+  {% endblock %}
+
+</main>
+
+<script src="{% static 'watchlist/htmx.min.js' %}" defer></script>
+<script src="{% static 'watchlist/build-themes.js' %}"></script>
+</body>
+</html>

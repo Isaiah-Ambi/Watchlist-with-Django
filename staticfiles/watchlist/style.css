@@ -1,0 +1,10 @@
+body {
+    padding: 1.5em;
+}
+.show {
+    padding: 2em;
+}
+
+.show_image {
+    width: inherit;
+}

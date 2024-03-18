@@ -1,15 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Search Results</title>
-</head>
-<body>
+{% extends 'watchlist/base.html' %}
     <h1>Search Results</h1>
+
+    {% block content %}
     {% if shows %}
         <ul>
             {% for show in shows %}
                 <li>
-                    <h2>{{ show.name }}</h2>
+                    <h2>{{ show.name }}</h2> <p>{{ show.status }} <span>{{ show.rating }}</span></p>
                     <img src="{{ show.image_url }}" alt="{{ show.name }}">
                     <p>{{ show.summary |safe }}</p>
                     <a href="{% url 'add-to-watchlist' show.tvmaze_id %}">Add to Watchlist</a>
@@ -19,5 +16,5 @@
     {% else %}
         <p>No shows found.</p>
     {% endif %}
-</body>
-</html>
+
+{% endblock %}
